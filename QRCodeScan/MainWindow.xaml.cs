@@ -68,12 +68,17 @@ namespace QRCodeScan
                         //BitmapSource bitmapSource = (BitmapSource)SampleQRImage.Source;//img.ToBitmapSource()
                         //String? text = scanQRcode(bitmapSource);
 
-                        Dispatcher.Invoke(() => {
+                        Dispatcher.Invoke(() =>
+                        {
                             ImageData.Source = WriteableBitmapConverter.ToWriteableBitmap(img);
 
                             BitmapSource bitmapSource = img.ToBitmapSource();
                             String? text = scanQRcode(bitmapSource);
-                            ResultStringLabel.Content = text;
+
+                            if (text != null)
+                            {
+                                ResultStringLabel.Content = text;
+                            }
 
                             ImageData.Source = bitmapSource;
                         });
@@ -99,7 +104,9 @@ namespace QRCodeScan
                 var result = reader.decode(binaryBitmap);
 
                 return result?.Text;
-            }catch(Exception) {
+            }
+            catch (Exception)
+            {
                 return null;
             }
 
@@ -137,7 +144,7 @@ namespace QRCodeScan
         }
 
 
-       
+
 
 
 
