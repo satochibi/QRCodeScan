@@ -1,9 +1,14 @@
-﻿using System.Threading.Tasks;
-using System.Windows;
-
+﻿using com.google.zxing;
+using com.google.zxing.common;
+using com.google.zxing.qrcode;
 using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
-
+using System;
+using System.Drawing;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace QRCodeScan
 {
@@ -22,15 +27,20 @@ namespace QRCodeScan
         {
             InitializeComponent();
 
-            
             // https://qiita.com/tricogimmick/items/79e85baa1e99eec840d8
             // 画面が読み込まれた最初のイベント
             ContentRendered += async (s, e) =>
             {
+                BitmapSource bitmapSource = (BitmapSource)SampleQRImage.Source;//img.ToBitmapSource()
+                String? text = scanQRcode(bitmapSource);
+                ResultStringLabel.Content = text;
+
                 await StartRollingCamera(0);
                 ImageData.Source = null;
+
+                
             };
-            
+
         }
 
         // https://marunaka-blog.com/take-webcamera-image-with-opencvsharp/839/
@@ -61,12 +71,36 @@ namespace QRCodeScan
 
                         if (img.Empty()) break;
 
-                       
-                        Dispatcher.Invoke(() => ImageData.Source = WriteableBitmapConverter.ToWriteableBitmap(img));
+                        //BitmapSource bitmapSource = (BitmapSource)SampleQRImage.Source;//img.ToBitmapSource()
+                        //String? text = scanQRcode(bitmapSource);
+
+                        Dispatcher.Invoke(() => { ImageData.Source = WriteableBitmapConverter.ToWriteableBitmap(img);  });
                     }
                 });
             }
             return false;
+        }
+
+
+        private String? scanQRcode(BitmapSource bitmapSource)
+        {
+            try
+            {
+                // create a barcode reader instance
+                var reader = new QRCodeReader();
+                // load a bitmap
+                var barcodeBitmap = ToBitmap(bitmapSource);
+
+                var source = new RGBLuminanceSource(barcodeBitmap, barcodeBitmap.Width, barcodeBitmap.Height);
+                BinaryBitmap binaryBitmap = new BinaryBitmap(new GlobalHistogramBinarizer(source));
+
+                var result = reader.decode(binaryBitmap);
+
+                return result?.Text;
+            }catch(Exception) {
+                return null;
+            }
+
         }
 
         // ウィンドウが閉じられたときのイベント
@@ -74,5 +108,37 @@ namespace QRCodeScan
         {
             IsLoop = true;
         }
+
+
+        private static Bitmap ToBitmap(BitmapSource bitmapSource)
+        {
+            // 処理
+            var bitmap = new System.Drawing.Bitmap(
+                bitmapSource.PixelWidth,
+                bitmapSource.PixelHeight,
+                System.Drawing.Imaging.PixelFormat.Format32bppPArgb
+            );
+            var bitmapData = bitmap.LockBits(
+                new System.Drawing.Rectangle(System.Drawing.Point.Empty, bitmap.Size),
+                System.Drawing.Imaging.ImageLockMode.WriteOnly,
+                System.Drawing.Imaging.PixelFormat.Format32bppPArgb
+            );
+            bitmapSource.CopyPixels(
+                System.Windows.Int32Rect.Empty,
+                bitmapData.Scan0,
+                bitmapData.Height * bitmapData.Stride,
+                bitmapData.Stride
+            );
+            bitmap.UnlockBits(bitmapData);
+
+            return bitmap;
+        }
+
+
+       
+
+
+
+
     }
 }

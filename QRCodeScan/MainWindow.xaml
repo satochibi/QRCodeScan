@@ -9,5 +9,7 @@
         Closing="Window_Closing">
     <Grid>
         <Image x:Name="ImageData" HorizontalAlignment="Left" Height="300" Margin="90,47,0,0" VerticalAlignment="Top" Width="300"/>
+        <Label x:Name="ResultStringLabel" Content="Label" HorizontalAlignment="Left" Margin="265,29,0,0" VerticalAlignment="Top"/>
+        <Image x:Name="SampleQRImage" HorizontalAlignment="Left" Height="100" Margin="612,205,0,0" VerticalAlignment="Top" Width="100" Source="https://www.denso-wave.com/fsys/ja/system/qr/fundamental/qrcode/qrc/img02_01.png"/>
     </Grid>
 </Window>
