@@ -31,14 +31,8 @@ namespace QRCodeScan
             // 画面が読み込まれた最初のイベント
             ContentRendered += async (s, e) =>
             {
-                BitmapSource bitmapSource = (BitmapSource)SampleQRImage.Source;//img.ToBitmapSource()
-                String? text = scanQRcode(bitmapSource);
-                ResultStringLabel.Content = text;
-
                 await StartRollingCamera(0);
                 ImageData.Source = null;
-
-                
             };
 
         }
@@ -74,7 +68,15 @@ namespace QRCodeScan
                         //BitmapSource bitmapSource = (BitmapSource)SampleQRImage.Source;//img.ToBitmapSource()
                         //String? text = scanQRcode(bitmapSource);
 
-                        Dispatcher.Invoke(() => { ImageData.Source = WriteableBitmapConverter.ToWriteableBitmap(img);  });
+                        Dispatcher.Invoke(() => {
+                            ImageData.Source = WriteableBitmapConverter.ToWriteableBitmap(img);
+
+                            BitmapSource bitmapSource = img.ToBitmapSource();
+                            String? text = scanQRcode(bitmapSource);
+                            ResultStringLabel.Content = text;
+
+                            ImageData.Source = bitmapSource;
+                        });
                     }
                 });
             }
@@ -116,12 +118,12 @@ namespace QRCodeScan
             var bitmap = new System.Drawing.Bitmap(
                 bitmapSource.PixelWidth,
                 bitmapSource.PixelHeight,
-                System.Drawing.Imaging.PixelFormat.Format32bppPArgb
+                System.Drawing.Imaging.PixelFormat.Format24bppRgb
             );
             var bitmapData = bitmap.LockBits(
                 new System.Drawing.Rectangle(System.Drawing.Point.Empty, bitmap.Size),
                 System.Drawing.Imaging.ImageLockMode.WriteOnly,
-                System.Drawing.Imaging.PixelFormat.Format32bppPArgb
+                System.Drawing.Imaging.PixelFormat.Format24bppRgb
             );
             bitmapSource.CopyPixels(
                 System.Windows.Int32Rect.Empty,
