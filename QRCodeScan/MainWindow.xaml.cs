@@ -65,9 +65,6 @@ namespace QRCodeScan
 
                         if (img.Empty()) break;
 
-                        //BitmapSource bitmapSource = (BitmapSource)SampleQRImage.Source;//img.ToBitmapSource()
-                        //String? text = scanQRcode(bitmapSource);
-
                         Dispatcher.Invoke(() =>
                         {
                             ImageData.Source = WriteableBitmapConverter.ToWriteableBitmap(img);
@@ -115,7 +112,7 @@ namespace QRCodeScan
         // ウィンドウが閉じられたときのイベント
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            IsLoop = true;
+            IsLoop = false;
         }
 
 
