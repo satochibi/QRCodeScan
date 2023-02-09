@@ -77,7 +77,6 @@ namespace QRCodeScan
                                 ResultStringLabel.Content = text;
                             }
 
-                            ImageData.Source = bitmapSource;
                         });
                     }
                 });
